@@ -8,13 +8,14 @@ class Node(tk.Frame):
     def __init__(self, parent, name, x, y):
         super().__init__(parent, cnf={})
         size = self.radius * 2
-        self.canvas = tk.Canvas(width=size, height=size)
+        self.canvas = parent
         self.x = x
         self.y = y
         self.name = name
         self.node_state = tk.IntVar()
         self.node_color = tk.StringVar()
         self.node_color.set('#ccc')
+        self.canvas_ids = []
 
         def node_state_change(node_state, node_color, *args):
             if node_state.get() == 0:
@@ -28,12 +29,12 @@ class Node(tk.Frame):
         self.draw_node()
 
     def draw_node(self):
-        self.canvas.create_oval(5, 5, 60, 60, fill=self.node_color.get(), outline='white')
-        self.canvas.create_text(30, 30, text=self.name)
-
-    def contains(self, x, y):
+        x = self.x
+        y = self.y
         radius = self.radius
-        return x >= self.x - radius and x <= self.x + radius and y >= self.y - radius and y <= self.y + radius
+        oval_id = self.canvas.create_oval(x-radius, y-radius, x+radius, y+radius, fill=self.node_color.get(), outline='white')
+        text_id = self.canvas.create_text(x, y, text=self.name)
+        self.canvas_ids = [oval_id, text_id]
 
     def get_bounding_box(self):
         x = self.x
