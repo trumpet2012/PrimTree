@@ -15,7 +15,7 @@ class Node(tk.Frame):
         self.node_state = tk.IntVar()
         self.node_color = tk.StringVar()
         self.node_color.set('#ccc')
-        self.canvas_ids = []
+        self.canvas_ids = {}
 
         def node_state_change(node_state, node_color, *args):
             if node_state.get() == 0:
@@ -34,7 +34,7 @@ class Node(tk.Frame):
         radius = self.radius
         oval_id = self.canvas.create_oval(x-radius, y-radius, x+radius, y+radius, fill=self.node_color.get(), outline='white')
         text_id = self.canvas.create_text(x, y, text=self.name)
-        self.canvas_ids = [oval_id, text_id]
+        self.canvas_ids = {'oval': oval_id, 'label': text_id}
 
     def get_bounding_box(self):
         x = self.x

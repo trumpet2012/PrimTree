@@ -2,6 +2,7 @@ import random
 import tkinter as tk
 
 from tree.node import Node
+from tree.associations import create_node_associations
 
 
 def node_clicked(event, canvas, nodes):
@@ -18,17 +19,29 @@ class NodeFrame(tk.Frame):
     def __init__(self, master=None, **kwargs):
         self.node_loaction_blocks = []
         super().__init__(master=master, **kwargs)
-
+        self.node_links = create_node_associations(10)
         self.canvas = tk.Canvas()
         self.canvas.config(width=600, height=600)
         self.canvas.pack()
         self.nodes = self.create_nodes()
 
         self.canvas.bind('<Button-1>', lambda event, canvas=self.canvas, nodes=self.nodes: node_clicked(event, canvas, nodes))
+        # self.canvas.coords(canvas_id)
 
-        node1 = self.nodes[2]
-        node2 = self.nodes[4]
-        self.canvas.create_line(node1.x, node1.y, node2.x, node2.y, fill='black')
+        for link in self.node_links:
+            first_node_index = link[0]
+            sec_node_index = link[1]
+
+            first_node = self.nodes[first_node_index]
+            second_node = self.nodes[sec_node_index]
+
+            self.canvas.create_line(first_node.x, first_node.y, second_node.x, second_node.y, fill='black')
+
+            # Will redraw the nodes on top of the lines, but this makes the associations hard to follow
+            # first_node.draw_node()
+            # second_node.draw_node()
+
+        # dist = math.sqrt((circle1.x-circle2.x)**2 + (circle1.y-circle2.y)**2) - circle1.r - circle2.r
 
     def create_nodes(self):
         nodes = {}
@@ -60,7 +73,7 @@ class NodeFrame(tk.Frame):
             print(x, y)
 
             node = Node(self.canvas, index, x, y)
-            [nodes.update({canvas_id: node}) for canvas_id in node.canvas_ids]
+            nodes.update({index: node})
 
         return nodes
 
