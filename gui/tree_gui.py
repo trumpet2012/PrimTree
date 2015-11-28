@@ -30,7 +30,7 @@ class NodeFrame(tk.Frame):
         self.nodes = self.create_nodes()
 
         # self.canvas.bind('<Button-1>', lambda event, canvas=self.canvas, nodes=self.nodes: node_clicked(event, canvas, nodes))
-        self.canvas.bind('<Button-1>', lambda event: self.plot_path(self.nodes.get(0)))
+        self.canvas.bind('<Button-1>', self.plot_path)
         self.link_nodes()
 
         self.canvas.bind('<Configure>', self.resize_canvas)
@@ -95,49 +95,39 @@ class NodeFrame(tk.Frame):
             # first_node.draw_node()
             # second_node.draw_node()
 
-    def plot_path(self, start_node):
-        next_node = True
-        curr_node = start_node
+    def plot_path(self, event):
+        nodes_remaining = self.nodes.copy()
+        selected_nodes = []
+        curr_node = nodes_remaining.pop(0)
+        selected_nodes.append(curr_node)
         curr_node.mark_visited()
-        while next_node:
+        while not len(nodes_remaining) == 0:
             best_path = None
-            path_options = curr_node.associations
-            for key, node_values in path_options.items():
-                poss_node = node_values.get('node')
-                if poss_node.node_state.get() == 1:
-                    continue
+            best_dist = None
+            node_to_best_node = None
 
-                if best_path is None:
-                    best_path = key
-                    continue
+            for best_node in selected_nodes:
+                path_options = best_node.associations
+                for key, node_values in path_options.items():
+                    poss_node = node_values.get('node')
+                    if poss_node.node_state.get() == 1:
+                        continue
 
-                if node_values.get('dist') < path_options.get(best_path).get('dist'):
-                    best_path = key
-            prev_node = curr_node
-            curr_node = path_options.get(best_path).get('node')
-            curr_line = path_options.get(best_path).get('line')
+                    if best_path is None:
+                        best_path = key
+                        node_to_best_node = best_node
+                        best_dist = node_values.get('dist')
+                        continue
+
+                    if node_values.get('dist') < best_dist:
+                        best_path = key
+                        node_to_best_node = best_node
+
+            curr_line = node_to_best_node.associations.get(best_path).get('line')
             self.canvas.itemconfig(curr_line, fill='red')
-            # time.sleep(1)
-            curr_node.mark_visited()
-            # time.sleep(1)
-
-            found_unvisited = False
-            for key, path in curr_node.associations.items():
-
-                poss_node = path.get('node')
-                if poss_node == curr_node:
-                    continue
-
-                if poss_node.node_state.get() == 0:
-                    found_unvisited = True
-
-            if found_unvisited:
-                next_node = True
-            else:
-                next_node = False
-
-
-
+            next_node = nodes_remaining.pop(best_path)
+            selected_nodes.append(next_node)
+            next_node.mark_visited()
 
 
 root = tk.Tk()
