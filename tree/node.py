@@ -11,7 +11,7 @@ class Node(tk.Frame):
         self.x = x
         self.y = y
         self.name = name
-        self.node_state = tk.IntVar()
+        self.node_state = tk.IntVar(0)
         self.node_color = tk.StringVar()
         self.node_color.set('#ccc')
         self.canvas_ids = {}
@@ -44,4 +44,4 @@ class Node(tk.Frame):
         return x - radius, y - radius, x + radius, y + radius
 
     def mark_visited(self):
-        self.node_state = 1
+        self.node_state.set(1)
