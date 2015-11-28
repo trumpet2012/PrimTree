@@ -1,4 +1,6 @@
+import math
 import random
+
 import tkinter as tk
 
 from tree.node import Node
@@ -21,7 +23,7 @@ class NodeFrame(tk.Frame):
         super().__init__(master=master, **kwargs)
         self.node_links = create_node_associations(10)
         self.canvas = tk.Canvas()
-        self.canvas.config(width=600, height=600)
+        self.canvas.config(width=600, height=600, bg='white')
         self.canvas.pack()
         self.nodes = self.create_nodes()
 
@@ -35,13 +37,23 @@ class NodeFrame(tk.Frame):
             first_node = self.nodes[first_node_index]
             second_node = self.nodes[sec_node_index]
 
-            self.canvas.create_line(first_node.x, first_node.y, second_node.x, second_node.y, fill='black')
+            first_x = first_node.x
+            first_y = first_node.y
+            second_x = second_node.x
+            second_y = second_node.y
+
+            dist = math.sqrt((first_x-second_x)**2 + (first_y-second_y)**2) - first_node.radius - second_node.radius
+
+            first_node.associations.update({sec_node_index: {'node': second_node, 'dist': dist}})
+            second_node.associations.update({first_node_index: {'node': first_node, 'dist': dist}})
+
+            self.canvas.create_line(first_x, first_y, second_x, second_y, fill='#ccc')
 
             # Will redraw the nodes on top of the lines, but this makes the associations hard to follow
             # first_node.draw_node()
             # second_node.draw_node()
 
-        # dist = math.sqrt((circle1.x-circle2.x)**2 + (circle1.y-circle2.y)**2) - circle1.r - circle2.r
+        self.canvas.bind('<Configure>', self.resize_canvas)
 
     def create_nodes(self):
         nodes = {}
@@ -50,8 +62,8 @@ class NodeFrame(tk.Frame):
             found_coord = False
             attempts = 0
             while not found_coord:
-                x = random.randint(0, 500)
-                y = random.randint(0, 500)
+                x = random.randint(35, 500)
+                y = random.randint(35, 500)
                 attempts += 1
                 valid_point = True
                 for old_x, old_y in self.node_loaction_blocks:
@@ -77,10 +89,12 @@ class NodeFrame(tk.Frame):
 
         return nodes
 
-root = tk.Tk()
-gui = NodeFrame(master=root, width=600, height=600)
+    def resize_canvas(self, event):
+        self.canvas.config(width=event.width, height=event.height)
 
+
+root = tk.Tk()
+gui = NodeFrame(master=root, width=600, height=600, bg='white')
 root.geometry('600x500')
 root.title = "Node Tree"
-root_canvas = tk.Canvas()
 root.mainloop()

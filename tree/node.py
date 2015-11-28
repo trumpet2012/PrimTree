@@ -7,7 +7,6 @@ class Node(tk.Frame):
 
     def __init__(self, parent, name, x, y):
         super().__init__(parent, cnf={})
-        size = self.radius * 2
         self.canvas = parent
         self.x = x
         self.y = y
@@ -16,6 +15,7 @@ class Node(tk.Frame):
         self.node_color = tk.StringVar()
         self.node_color.set('#ccc')
         self.canvas_ids = {}
+        self.associations = {}
 
         def node_state_change(node_state, node_color, *args):
             if node_state.get() == 0:
