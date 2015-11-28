@@ -18,23 +18,21 @@ def node_clicked(event, canvas, nodes):
 
 class NodeFrame(tk.Frame):
 
-    num_nodes = 10
+    num_nodes = 20
 
     def __init__(self, master=None, **kwargs):
         self.node_loaction_blocks = []
         super().__init__(master=master, **kwargs)
-        self.node_links = create_node_associations(10)
-        self.canvas = tk.Canvas()
-        self.canvas.config(width=600, height=600, bg='white')
+        self.node_links = create_node_associations(self.num_nodes)
+        self.canvas = tk.Canvas(**kwargs)
+        self.canvas.config(bg='white')
         self.canvas.pack()
         self.nodes = self.create_nodes()
 
-        # self.canvas.bind('<Button-1>', lambda event, canvas=self.canvas, nodes=self.nodes: node_clicked(event, canvas, nodes))
         self.canvas.bind('<Button-1>', self.plot_path)
         self.link_nodes()
 
         self.canvas.bind('<Configure>', self.resize_canvas)
-
 
     def create_nodes(self):
         nodes = {}
@@ -43,8 +41,8 @@ class NodeFrame(tk.Frame):
             found_coord = False
             attempts = 0
             while not found_coord:
-                x = random.randint(35, 500)
-                y = random.randint(35, 500)
+                x = random.randint(35, int(self.canvas.config('width')[4]) - 35)
+                y = random.randint(35, int(self.canvas.config('height')[4]) - 35)
                 attempts += 1
                 valid_point = True
                 for old_x, old_y in self.node_loaction_blocks:
@@ -131,7 +129,7 @@ class NodeFrame(tk.Frame):
 
 
 root = tk.Tk()
-gui = NodeFrame(master=root, width=600, height=600, bg='white')
-root.geometry('600x500')
+gui = NodeFrame(master=root, width=800, height=800, bg='white')
+root.geometry('800x800')
 root.title = "Node Tree"
 root.mainloop()
