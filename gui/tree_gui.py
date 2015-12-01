@@ -1,7 +1,5 @@
 import math
-import time
 import random
-import heapq
 
 import tkinter as tk
 
